@@ -46,6 +46,7 @@ gem 'omniauth'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-openid'
 gem 'acts-as-taggable-on', '~> 3.5'
+gem 'twilio-ruby'
 
 # Bundle gems for the local environment. Make sure to
 # put test-only gems in this group so their generators

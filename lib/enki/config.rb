@@ -20,6 +20,14 @@ module Enki
       [self[:author, :google_oauth2_email]].pop
     end
 
+    def self.author_sms
+      default[:author][:sms]
+    end
+
+    def self.from_sms
+      default[:from_sms]
+    end
+
     def self.default
       Enki::Config.new(default_location)
     end
