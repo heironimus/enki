@@ -52,6 +52,7 @@ class CommentsController < ApplicationController
 
   def save_comment_or_show_error
     if @comment.save
+      Notification.deliver_comment(@comment.body)
       session[:pending_comment] = nil
       session[:post_id] = nil
       redirect_to post_path(@post)

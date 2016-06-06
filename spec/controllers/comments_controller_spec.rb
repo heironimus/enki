@@ -75,45 +75,57 @@ describe CommentsController, 'handling commenting' do
   end
 
   describe "with a POST to #index (non-OpenID comment)" do
-    before(:each) do
+    describe "field behavior" do
+      before(:each) do
+        mock_post!
+
+        post :create, :year => '2007', :month => '01', :day => '01', :slug => 'a-post', :comment => {
+          :author => 'Don Alias',
+          :body   => 'This is a comment',
+
+          # Attributes you are not allowed to set
+          :author_url              => 'http://www.enkiblog.com',
+          :author_email            => 'donalias@enkiblog.com',
+          :created_at              => @created_at = 1.year.ago,
+          :updated_at              => @updated_at = 1.year.ago
+        }
+      end
+
+      it_behaves_like("creating new comment")
+
+      it "allows setting of author" do
+        expect(assigns(:comment).author).to eq('Don Alias')
+      end
+
+      it "allows setting of body" do
+        expect(assigns(:comment).body).to eq('This is a comment')
+      end
+
+      it "forbids setting of author_url" do
+        expect(assigns(:comment).author_url).to be_blank
+      end
+
+      it "forbids setting of author_email" do
+        expect(assigns(:comment).author_email).to be_blank
+      end
+
+      it "forbids setting of created_at" do
+        expect(assigns(:comment).created_at).not_to eq(@created_at)
+      end
+
+      it "forbids setting of updated_at" do
+        expect(assigns(:comment).updated_at).not_to eq(@updated_at)
+      end
+    end
+
+    it "sends comment notification" do
+      expect(Notification).to receive(:deliver_comment).with('This is a comment')
       mock_post!
 
-      post :create, :year => '2007', :month => '01', :day => '01', :slug => 'a-post', :comment => {
+      post :create, :year => '2007', :month => '01', :day => '01', :comment => {
         :author => 'Don Alias',
-        :body   => 'This is a comment',
-
-        # Attributes you are not allowed to set
-        :author_url              => 'http://www.enkiblog.com',
-        :author_email            => 'donalias@enkiblog.com',
-        :created_at              => @created_at = 1.year.ago,
-        :updated_at              => @updated_at = 1.year.ago
+        :body   => 'This is a comment'
       }
-    end
-
-    it_behaves_like("creating new comment")
-
-    it "allows setting of author" do
-      expect(assigns(:comment).author).to eq('Don Alias')
-    end
-
-    it "allows setting of body" do
-      expect(assigns(:comment).body).to eq('This is a comment')
-    end
-
-    it "forbids setting of author_url" do
-      expect(assigns(:comment).author_url).to be_blank
-    end
-
-    it "forbids setting of author_email" do
-      expect(assigns(:comment).author_email).to be_blank
-    end
-
-    it "forbids setting of created_at" do
-      expect(assigns(:comment).created_at).not_to eq(@created_at)
-    end
-
-    it "forbids setting of updated_at" do
-      expect(assigns(:comment).updated_at).not_to eq(@updated_at)
     end
   end
 end
